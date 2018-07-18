@@ -29,18 +29,4 @@ haha
 3 said haha
 ```
 
-手册
-=======
-http://www.workerman.net/gatewaydoc/
 
-使用GatewayWorker-for-win开发的项目
-=======
-## [tadpole](http://kedou.workerman.net/)  
-[Live demo](http://kedou.workerman.net/)  
-[Source code](https://github.com/walkor/workerman)  
-![workerman-todpole](http://www.workerman.net/img/workerman-todpole.png)   
-
-## [chat room](http://chat.workerman.net/)  
-[Live demo](http://chat.workerman.net/)  
-[Source code](https://github.com/walkor/workerman-chat)  
-![workerman-chat](http://www.workerman.net/img/workerman-chat.png)  
