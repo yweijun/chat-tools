@@ -1,0 +1,29 @@
+.c-chat-div{width: 800px;height: 560px;border: 1px solid #ddd;display: flex;flex-wrap: wrap;position: absolute;top: 50px;left: 50px;transition: all 1s;transform: scale(0);}
+.c-chat-head{width: 800px;height: 40px;line-height: 40px;border-bottom: 1px solid #ddd;font-size: 18px;padding: 0 15px;}
+.c-chat-list{width: 200px;height: 519px;border-right: 1px solid #ddd;overflow: auto;}
+.c-chat-list>ul{padding:0;margin: 0;}
+.c-chat-list>ul>li{position: relative;display: flex;list-style-type:none;height:50px;line-height:50px;padding:5px 10px;background-color: #fff;align-items: center;justify-content: flex-start;}
+.c-chat-list>ul>li:hover{background: #efefef;}
+.c-chat-list>ul>li:hover .c-chat-close{display: inline-block;}
+.c-chat-list>ul>li .c-chat-close{position: absolute;top:0; right: 10px;display: none;}
+.c-chat-list>ul>li.c-chat-list-li-select{background: #efefef;}
+.c-chat-content{width: 599px;}
+.c-chat-content-main{width: calc(100% - 20px);height: 280px;border-bottom: 1px solid #ddd;vertical-align:  top;overflow: auto;padding: 10px;}
+.c-chat-tools{width: 100%;height: 30px;border-bottom: 1px solid #ddd;}
+div.c-chat-text{width: calc(100% - 20px);height: 110px;border-bottom: 1px solid #ddd;padding: 10px;}
+div.c-chat-text>textarea.c-chat-text-edit{width: 100%;height: 100%;resize: none;font-size: 18px;border: none;outline: none;}
+/*定义滚动条轨道 内阴影+圆角*/
+.c-chat-list::-webkit-scrollbar-track, .c-chat-content-main::-webkit-scrollbar-track,
+div.c-chat-text>textarea.c-chat-text-edit::-webkit-scrollbar-track {-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);border-radius: 5px;background-color: #fff;}
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+.c-chat-list::-webkit-scrollbar, .c-chat-content-main::-webkit-scrollbar,
+div.c-chat-text>textarea.c-chat-text-edit::-webkit-scrollbar {width: 8px;height: 100%;background-color: #fff;}
+/*定义滑块 内阴影+圆角*/
+.c-chat-list::-webkit-scrollbar-thumb, .c-chat-content-main::-webkit-scrollbar-thumb,
+div.c-chat-text>textarea.c-chat-text-edit::-webkit-scrollbar-thumb {border-radius: 5px; /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);*/background-color: #ddd;}
+div.c-chat-button{height: 40px;line-height: 40px;display: flex;align-items: center;justify-content: flex-end;padding: 10px;}
+div.c-chat-button>button{border: 1px solid #d7d7d7;width: 80px;height:30px;background-color: #EFEFEF;outline: none;}
+div.c-chat-button>button:hover{background-color: #0dc004;border: #0dc004;color: #fff;cursor: pointer;}
+.c-chat-close::before {display: inline-block;content: "\2716";background-color: #9b9b9b;color: #fff; font-size: 13px; border-radius: 10px;width: 20px;height: 20px;line-height: 20px;text-align: center;}
+
+
