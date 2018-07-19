@@ -29,6 +29,7 @@ use \GatewayWorker\Lib\Gateway;
 class Events
 {
     private static $clientArr = array();
+    private static $logs = array();     //聊天记录
     /**
      * 当客户端连接时触发
      * 如果业务不需此回调可以删除onConnect
@@ -60,11 +61,13 @@ class Events
                Gateway::sendToClient($client_id, self::retData($type, $ret));
                return;
            case 'chat':
-//               Gateway::sendToClient($client_id, self::retData($type, '收到消息：'. $message['content']));
                $content = array();
                $content['from'] = Gateway::getUidByClientId($client_id);
                $content['to'] = $message['to'];
                $content['content'] = $message['content'];
+               $content['time'] = time();
+
+               self::$logs[] = $content;    //存入聊天记录
                Gateway::sendToUid($message['to'], self::retData($type, $content));
                return;
            case 'login':
@@ -84,6 +87,15 @@ class Events
                // 通知其他用户，我已上线
                Gateway::sendToAll(self::retData('newMember', array('id' => $uid)), '', array($client_id));
                return;
+           case 'logs':
+               $logs = array();
+               foreach (self::$logs as $key => $item) {
+                    if ( ($item['from'] === Gateway::getUidByClientId($client_id) && $item['to'] === $message['content']) ||
+                        ($item['to'] === Gateway::getUidByClientId($client_id) && $item['from'] === $message['content']) ) {
+                        $logs[] = $item;
+                    }
+               }
+               Gateway::sendToClient($client_id, self::retData('logs', $logs));
        }
    }
    

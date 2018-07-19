@@ -43,19 +43,19 @@
         this.listUlElement = document.createElement('ul');
         this.listDivElement = '';
         this.editElement = '';
-        this.sendContent = '';
         this.divId = '';    //聊天框id
         this.showBtnId = '';    //聊天框显示/隐藏按钮
 
         /* websocket连接信息 */
         this.host = '';
         this.port = '';
-        this.http = 'ws';
+        this.socket = 'ws';
         this.ws = '';
 
         /* 聊天对象信息 */
         this.onlineArr = [];
         this.talkTo = '';   // 当前聊天对象
+        this.myId = '';
     }
 
     Chat.prototype = {
@@ -73,7 +73,7 @@
             that.chatDivShow();
             showButton.onclick = function () {
                 that.isShow ? that.chatDivHide() : that.chatDivShow();
-            }
+            };
             // this.chatListInit();
             this.wsInit();
             let senBtn = this.div.getElementsByTagName('button')[0];
@@ -126,13 +126,13 @@
                 y = chatDiv.offsetTop;
                 x = chatDiv.offsetLeft;
                 chatDiv.style.cursor = 'move';
-            })
+            });
             // 监听头部鼠标抬起
-            chatDivHead.addEventListener('mouseup', function (e) {
+            chatDivHead.addEventListener('mouseup', function () {
                 that.dragable = false;
                 that.div.style.transition = 'all 1s';
                 chatDiv.style.cursor = 'initial';
-            })
+            });
             // 鼠标移动
             document.onmousemove = function (e) {
                 if(that.dragable === true){
@@ -157,7 +157,7 @@
         },
         // 添加新聊天对象
         addNewDialog: function (data) {
-            var that = this;
+            let that = this;
             let li = document.createElement('li');
             let headImg = document.createElement('img');
             let infoSpan = document.createElement('span');
@@ -192,8 +192,8 @@
                 that.talkTo = data.id;
 
                 // 获取选中对象的聊天记录
-
-            }
+                that.sendMsg('logs', data.id);
+            };
             // 关闭某一聊天窗口
             closeBtn.onclick = function () {
                 li.remove();
@@ -226,8 +226,9 @@
             let headImg = document.createElement('img');
             let contentSpan = document.createElement('span');
             headImg.style.cssText = "display:inline-block;width:40px;height:40px;border-radius:5px;min-width:40px;";
-            contentSpan.style.cssText = "margin:0 10px;padding:10px;background-color:#ddd;border-radius:10px;word-wrap:break-word;word-break:break-all;";
-            contentSpan.innerHTML = data;
+            contentSpan.style.cssText = "margin:0 10px;padding:10px;background-color:#ddd;" +
+                "border-radius:10px;word-wrap:break-word;word-break:break-all;white-space:normal;";
+            contentSpan.innerText = data;
             headImg.src = "300.jpg";
             showContent.appendChild(logDiv);
             logDiv.appendChild(headImg);
@@ -247,18 +248,26 @@
 
         },
         // 拉取指定聊天对象的聊天记录
-        getChatLogById: function () {
-
+        getChatLogById: function (logs) {
+            let showContent = this.div.getElementsByClassName('c-chat-content-main')[0];
+            showContent.innerHTML = '';
+            for(let i=0;i<logs.length;i++){
+                if (logs[i].from === this.myId) {
+                    this.createSingleLog(logs[i].content, 1);
+                } else {
+                    this.createSingleLog(logs[i].content);
+                }
+            }
         },
         // 连接ws
         wsInit: function () {
             let that = this;
-            this.ws = new WebSocket(this.http + "://" + this.host + ":" + this.port);
+            this.ws = new WebSocket(this.socket + "://" + this.host + ":" + this.port);
             // 连接
             this.ws.onopen = function () {
                 that.sendMsg('login');
                 console.log('连接');
-            }
+            };
             //收到消息
             this.ws.onmessage = function (res) {
                 let msg = JSON.parse(res.data);
@@ -272,6 +281,7 @@
                         that.getMsg(msg.content);
                         break;
                     case 'login':
+                        that.myId = msg.content.m;
                         that.onlineArr = msg.content.online;
                         if (that.onlineArr.length > 0){
                             that.chatListInit(msg.content.online);
@@ -295,12 +305,15 @@
                             }
                         }
                         break;
+                    case 'logs':
+                        that.getChatLogById(msg.content);
+                        break;
                 }
-            }
+            };
             // 关闭连接
             this.ws.onclose = function () {
                 console.log('关闭了');
-            }
+            };
             // 连接出错
             this.ws.onerror = function () {
                 console.log('出错了');
@@ -331,7 +344,7 @@
             };
             this.ws.send(JSON.stringify(data));
         }
-    }
+    };
 
     let chat = new Chat();
     chat.init({
