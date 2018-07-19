@@ -82,6 +82,7 @@
             }
         },
         createChatElement: function () {
+            let that = this;
             this.div.classList.add('c-chat-div');
             this.div.innerHTML = "<div class='c-chat-head'>\n" +
                 "        客服聊天\n" +
@@ -107,7 +108,52 @@
                 "    </div>";
             document.getElementById(this.divId).appendChild(this.div);
             this.listDivElement = document.getElementsByClassName('c-chat-list')[0];
-            this.editElement = this.div.getElementsByClassName('c-chat-text-edit')[0]
+            this.editElement = this.div.getElementsByClassName('c-chat-text-edit')[0];
+            // 在光标后面插入
+            function insertAfterText(textDom, value) {
+                var selectRange;
+                if (document.selection) {
+                    // IE Support
+                    textDom.focus();
+                    selectRange = document.selection.createRange();
+                    selectRange.text = value;
+                    textDom.focus();
+                }else if (textDom.selectionStart || textDom.selectionStart == '0') {
+                    // Firefox support
+                    var startPos = textDom.selectionStart;
+                    var endPos = textDom.selectionEnd;
+                    var scrollTop = textDom.scrollTop;
+                    textDom.value = textDom.value.substring(0, startPos) + value + textDom.value.substring(endPos, textDom.value.length);
+                    textDom.focus();
+                    textDom.selectionStart = startPos + value.length;
+                    textDom.selectionEnd = startPos + value.length;
+                    textDom.scrollTop = scrollTop;
+                }
+                else {
+                    textDom.value += value;
+                    textDom.focus();
+                }
+            }
+            function enterSend() {
+                // ctrl+enter换行
+                if (event.ctrlKey && event.keyCode == 13){
+                    insertAfterText(that.editElement, '\r');
+                    event.returnValue = false;
+                    return false;
+                }
+                // 回车发送
+                if (event.keyCode == 13){
+                    that.send();
+                    event.returnValue = false;
+                    return false;
+                }
+            }
+            this.editElement.onfocus = function () {
+                document.addEventListener('keydown',enterSend)
+            };
+            this.editElement.onblur = function () {
+                document.removeEventListener('keydown', enterSend);
+            };
         },
         // 弹出聊天框
         chatDivShow: function () {
