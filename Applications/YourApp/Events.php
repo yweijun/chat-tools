@@ -78,6 +78,7 @@ class Events
            case 'login':
                $uid = $message['content'];
                Gateway::bindUid($client_id, $uid);
+               Gateway::joinGroup($client_id, 'online');
                $online = Gateway::getAllUidList();
                foreach ($online as $key =>$val){
                    if ($val !== $uid){
@@ -87,7 +88,7 @@ class Events
                $initData['m'] = $uid;
                Gateway::sendToClient($client_id, self::retData('login', $initData));
                // 通知其他用户，我已上线
-               Gateway::sendToAll(self::retData('newMember', array('id' => $uid)), '', array($client_id));
+               Gateway::sendToGroup('online',self::retData('newMember', array('id' => $uid)), array($client_id));
                return;
            /* 聊天记录 */
            case 'logs':

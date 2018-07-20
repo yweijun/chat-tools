@@ -181,11 +181,11 @@
         },
         // 聊天列表初始化
         chatListInit: function (list) {
+            this.listDivElement.appendChild(this.listUlElement);
             if (!list || list.length === 0) {
-                this.listDivElement.innerText = '暂无好友在线';
+                this.listUlElement.innerText = '暂无好友在线';
                 return false;
             }
-            this.listDivElement.appendChild(this.listUlElement);
             for(let i=0;i<list.length;i++) {
                 this.addNewDialog(list[i]);
             }
@@ -323,6 +323,7 @@
                     case 'newMember':
                         if(that.onlineArr.length <= 0){
                             that.onlineArr.push(msg.content);   //添加到在线数组
+                            that.listUlElement.innerHTML = '';
                             that.addNewDialog(msg.content);
                         } else {
                             let tmp = true;
