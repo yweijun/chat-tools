@@ -41,25 +41,29 @@ class Events
         $initData = array();
         $initData['title'] = '欢迎使用聊天系统';
     }
-    
-   /**
-    * 当客户端发来消息时触发
-    * @param int $client_id 连接id
-    * @param mixed $message 具体消息
-    */
+
+    /**
+     * 当客户端发来消息时触发
+     * @param int $client_id 连接id
+     * @param mixed $message 具体消息
+     * @throws Exception
+     */
    public static function onMessage($client_id, $message)
    {
        $message = json_decode($message, true);
        $type = $message['type'];
        switch ($type) {
+           /* 心跳检测 */
            case 'pong':
                return;
+           /* 初始化数据 */
            case 'init':
                $ret = array();
                $ret['client'] = $client_id;
                $ret['all'] = self::$clientArr;
                Gateway::sendToClient($client_id, self::retData($type, $ret));
                return;
+           /* 发送聊天信息 */
            case 'chat':
                $content = array();
                $content['from'] = Gateway::getUidByClientId($client_id);
@@ -70,12 +74,11 @@ class Events
                self::$logs[] = $content;    //存入聊天记录
                Gateway::sendToUid($message['to'], self::retData($type, $content));
                return;
+           /* 登陆 */
            case 'login':
-               $uid = '1';
-               if (Gateway::isUidOnline($uid)) {
-                   $uid = '2';
-               }
+               $uid = $message['content'];
                Gateway::bindUid($client_id, $uid);
+               Gateway::joinGroup($client_id, 'online');
                $online = Gateway::getAllUidList();
                foreach ($online as $key =>$val){
                    if ($val !== $uid){
@@ -84,18 +87,20 @@ class Events
                }
                $initData['m'] = $uid;
                Gateway::sendToClient($client_id, self::retData('login', $initData));
-               // 通知其他用户，我已上线
-               Gateway::sendToAll(self::retData('newMember', array('id' => $uid)), '', array($client_id));
+               // 通知在线其他用户，我已上线
+               Gateway::sendToGroup('online', self::retData('newMember', array('id' => $uid)), '', array($client_id));
                return;
+           /* 聊天记录 */
            case 'logs':
                $logs = array();
                foreach (self::$logs as $key => $item) {
-                    if ( ($item['from'] === Gateway::getUidByClientId($client_id) && $item['to'] === $message['content']) ||
-                        ($item['to'] === Gateway::getUidByClientId($client_id) && $item['from'] === $message['content']) ) {
+                    if ( ($item['from'] == Gateway::getUidByClientId($client_id) && $item['to'] == $message['content']) ||
+                        ($item['to'] == Gateway::getUidByClientId($client_id) && $item['from'] == $message['content']) ) {
                         $logs[] = $item;
                     }
                }
                Gateway::sendToClient($client_id, self::retData('logs', $logs));
+               return;
        }
    }
    

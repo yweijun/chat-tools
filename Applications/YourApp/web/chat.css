@@ -1,5 +1,5 @@
 .c-chat-div{width: 800px;height: 560px;border: 1px solid #ddd;display: flex;flex-wrap: wrap;position: absolute;top: 50px;left: 50px;transition: all 1s;transform: scale(0);}
-.c-chat-head{width: 800px;height: 40px;line-height: 40px;border-bottom: 1px solid #ddd;font-size: 18px;padding: 0 15px;}
+.c-chat-head{width: 800px;height: 40px;line-height: 40px;border-bottom: 1px solid #ddd;font-size: 18px;padding: 0 15px;background-color:#fff;color: #000;}
 .c-chat-list{width: 200px;height: 519px;border-right: 1px solid #ddd;overflow: auto;}
 .c-chat-list>ul{padding:0;margin: 0;}
 .c-chat-list>ul>li{position: relative;display: flex;list-style-type:none;height:50px;line-height:50px;padding:5px 10px;background-color: #fff;align-items: center;justify-content: flex-start;}
