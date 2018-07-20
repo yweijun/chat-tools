@@ -32,9 +32,12 @@
     <!--</div>-->
 </div>
 <div id="btn">
-    <span>联系客服</span>
+    <button>显示/隐藏</button>
 </div>
+
+<input type="text" id="username"><button id="login">登陆</button>
 </body>
+
 <script>
     function Chat() {
         this.dragable = false;  //是否可拖拽
@@ -74,8 +77,13 @@
             showButton.onclick = function () {
                 that.isShow ? that.chatDivHide() : that.chatDivShow();
             };
-            // this.chatListInit();
             this.wsInit();
+            // 登陆
+            document.getElementById('login').onclick = function () {
+                let username = document.getElementById('username').value;
+                that.sendMsg('login', username);
+            }
+
             let senBtn = this.div.getElementsByTagName('button')[0];
             senBtn.onclick = function () {
                 that.send();
@@ -109,31 +117,8 @@
             document.getElementById(this.divId).appendChild(this.div);
             this.listDivElement = document.getElementsByClassName('c-chat-list')[0];
             this.editElement = this.div.getElementsByClassName('c-chat-text-edit')[0];
-            // 在光标后面插入
-            function insertAfterText(textDom, value) {
-                var selectRange;
-                if (document.selection) {
-                    // IE Support
-                    textDom.focus();
-                    selectRange = document.selection.createRange();
-                    selectRange.text = value;
-                    textDom.focus();
-                }else if (textDom.selectionStart || textDom.selectionStart == '0') {
-                    // Firefox support
-                    var startPos = textDom.selectionStart;
-                    var endPos = textDom.selectionEnd;
-                    var scrollTop = textDom.scrollTop;
-                    textDom.value = textDom.value.substring(0, startPos) + value + textDom.value.substring(endPos, textDom.value.length);
-                    textDom.focus();
-                    textDom.selectionStart = startPos + value.length;
-                    textDom.selectionEnd = startPos + value.length;
-                    textDom.scrollTop = scrollTop;
-                }
-                else {
-                    textDom.value += value;
-                    textDom.focus();
-                }
-            }
+
+            // 回车监听事件
             function enterSend() {
                 // ctrl+enter换行
                 if (event.ctrlKey && event.keyCode == 13){
@@ -143,7 +128,7 @@
                 }
                 // 回车发送
                 if (event.keyCode == 13){
-                    that.send();
+                    that.send()
                     event.returnValue = false;
                     return false;
                 }
@@ -197,12 +182,17 @@
         // 聊天列表初始化
         chatListInit: function (list) {
             this.listDivElement.appendChild(this.listUlElement);
+            if (!list || list.length === 0) {
+                this.listUlElement.innerText = '暂无好友在线';
+                return false;
+            }
             for(let i=0;i<list.length;i++) {
                 this.addNewDialog(list[i]);
             }
         },
         // 添加新聊天对象
         addNewDialog: function (data) {
+             console.log(data);
             let that = this;
             let li = document.createElement('li');
             let headImg = document.createElement('img');
@@ -311,7 +301,6 @@
             this.ws = new WebSocket(this.socket + "://" + this.host + ":" + this.port);
             // 连接
             this.ws.onopen = function () {
-                that.sendMsg('login');
                 console.log('连接');
             };
             //收到消息
@@ -328,24 +317,23 @@
                         break;
                     case 'login':
                         that.myId = msg.content.m;
-                        that.onlineArr = msg.content.online;
-                        if (that.onlineArr.length > 0){
-                            that.chatListInit(msg.content.online);
-                        }
+                        that.onlineArr = msg.content.online ? msg.content.online : [];
+                        that.chatListInit(msg.content.online);
                         break;
                     case 'newMember':
                         if(that.onlineArr.length <= 0){
                             that.onlineArr.push(msg.content);   //添加到在线数组
+                            that.listUlElement.innerHTML = '';
                             that.addNewDialog(msg.content);
                         } else {
-                            let tmp = 0;
+                            let tmp = true;
                             for(let i=0; i<that.onlineArr.length; i++) {
-                                tmp = i+1;
-                                if(msg.content.id === that.onlineArr[i].id){
+                                if(msg.content.id == that.onlineArr[i].id){
+                                    tmp = false;
                                     break;
                                 }
                             }
-                            if (tmp > that.onlineArr.length) {
+                            if (tmp) {
                                 that.onlineArr.push(msg.content);   //添加到在线数组
                                 that.addNewDialog(msg.content);
                             }
@@ -399,6 +387,32 @@
         host: '127.0.0.1',
         port: '8282',
     });
+
+    // 在光标后面插入
+    function insertAfterText(textDom, value) {
+        let selectRange;
+        if (document.selection) {
+            // IE Support
+            textDom.focus();
+            selectRange = document.selection.createRange();
+            selectRange.text = value;
+            textDom.focus();
+        }else if (textDom.selectionStart || textDom.selectionStart == '0') {
+            // Firefox support
+            let startPos = textDom.selectionStart;
+            let endPos = textDom.selectionEnd;
+            let scrollTop = textDom.scrollTop;
+            textDom.value = textDom.value.substring(0, startPos) + value + textDom.value.substring(endPos, textDom.value.length);
+            textDom.focus();
+            textDom.selectionStart = startPos + value.length;
+            textDom.selectionEnd = startPos + value.length;
+            textDom.scrollTop = scrollTop;
+        }
+        else {
+            textDom.value += value;
+            textDom.focus();
+        }
+    }
 </script>
 
 <!--<script>-->
