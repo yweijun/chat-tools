@@ -87,7 +87,7 @@ class Events
                }
                $initData['m'] = $uid;
                Gateway::sendToClient($client_id, self::retData('login', $initData));
-               // 通知其他用户，我已上线
+               // 通知其他在线用户，我已上线
                Gateway::sendToGroup('online',self::retData('newMember', array('id' => $uid)), array($client_id));
                return;
            /* 聊天记录 */
